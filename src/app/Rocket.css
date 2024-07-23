@@ -1,0 +1,103 @@
+@import url("https://fonts.googleapis.com/css?family=Montserrat:400,400i,700");
+
+body {
+  /*background-image: url("https://images.unsplash.com/photo-1570284613060-766c33850e00?crop=entropy&cs=srgb&fm=jpg&ixid=M3wzMjM4NDZ8MHwxfHJhbmRvbXx8fHx8fHx8fDE3MTcwMDkxNjl8&ixlib=rb-4.0.3&q=85");*/
+  background-size: 130%;
+  background-color: #121317;
+  background-position-x: top;
+  background-position-y: left;
+  display: grid;
+  place-content: center;
+}
+
+h1 {
+  color: #fff;
+  font-family: Montserrat;
+  margin-top: 30vh;
+  font-size: 6rem;
+  & svg {
+    width: 6rem;
+    height: auto;
+  }
+}
+
+.rocket {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1;
+
+  & svg {
+    fill: #ff8811;
+    stroke: transparent;
+    height: 44px;
+    width: 32px;
+  }
+}
+
+.glow {
+  width: 0;
+  height: 0;
+  box-shadow: 0 0 200px 40px #f6ae2d;
+  position: absolute;
+  top: 0;
+  left: 50%;
+}
+
+.heart {
+  position: absolute;
+  top: -24px;
+  right: 50%;
+  transform: rotate(-65deg);
+  color: red;
+  opacity: 0;
+  transition: opacity 0.5s;
+}
+
+@keyframes fadeout {
+  to {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+/* -- youtube link styling -- */
+
+.links {
+  border-top: 1px solid #ffffff50;
+  border-right: 1px solid #ffffff50;
+  border-top-right-radius: 0.5rem;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  padding: 0.5rem;
+  font-family: Montserrat;
+  font-size: 1.2rem;
+  font-weight: 400;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  & > a {
+    color: #ffffff;
+    text-decoration: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    opacity: 0.5;
+    &:hover {
+      opacity: 1;
+    }
+
+    & > svg {
+      margin-left: 0.5rem;
+      flex-shrink: 0;
+    }
+    &:nth-child(1) > svg {
+      stroke: #dd2d4a;
+    }
+    &:nth-child(2) > svg {
+      stroke: #2b59c3;
+    }
+  }
+}

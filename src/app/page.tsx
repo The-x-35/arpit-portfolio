@@ -1,11 +1,11 @@
 import Image from "next/image";
 import StarsCanvas from "./components/StarsCanvas";
-import Cursor from "./Cursor";
+import Rocket from "./Rocket";
 
 export default function Home() {
   return (
     <>
-    <Cursor />
+    <Rocket />
     <StarsCanvas />
     </>
   );
