@@ -35,14 +35,14 @@ h1 {
   }
 }
 
-.glow {
+/* .glow {
   width: 0;
   height: 0;
   box-shadow: 0 0 200px 40px #f6ae2d;
   position: absolute;
   top: 0;
   left: 50%;
-}
+} */
 
 .heart {
   position: absolute;
@@ -101,3 +101,4 @@ h1 {
     }
   }
 }
+

@@ -1,75 +1,185 @@
-// "use client" directive at the top of the file
 "use client";
 
 import React, { useEffect, useRef, useState } from 'react';
-import './Rocket.css'; // Assuming you have a CSS file for styling
+import './Rocket.css';
 
-const Rocket = () => {
+const Rocket: React.FC = () => {
   const rocketRef = useRef<HTMLDivElement>(null);
   const heartRef = useRef<HTMLDivElement>(null);
+  const [rocketPosition, setRocketPosition] = useState({ x: 0, y: 0 });
+  const [rocketSize, setRocketSize] = useState({ width: 0, height: 0 });
+  const [initialized, setInitialized] = useState(false);
 
-  // Initialize variables for later use
-  let angle = 0;
-  let tick = 0; // A counter to keep track of frames
-  const fumeCount = 20; // Number of fume particles
+  const fumeCount = 20;
+  const fps = 60;
+  const fumeFrequency = 0.5; // Adjusted frequency for fume generation
+  const [tick, setTick] = useState(0);
 
-  // Define a state to manage fume particles
-  const [fumes, setFumes] = useState<number[]>(Array(fumeCount).fill(0));
+  const mousePosition = useRef({ x: 0, y: 0 });
+  const fumes = useRef<HTMLDivElement[]>([]);
+  const fumeSizes = useRef<number[]>(Array.from({ length: fumeCount }, () => Math.random() * 20 + 10));
 
   useEffect(() => {
-    const mouseMargin = 5;
-
     const rocket = rocketRef.current;
     const heart = heartRef.current;
+    const body = document.querySelector("body");
 
-    const updatePosition = (event: MouseEvent) => {
-      if (rocket && heart) {
-        const { clientX: mouseX, clientY: mouseY } = event;
+    if (!rocket || !heart || !body) return;
 
-        rocket.style.left = `${mouseX - rocket.offsetWidth / 2}px`;
-        rocket.style.top = `${mouseY - rocket.offsetHeight / 2}px`;
+    if (!initialized) {
+      const rocketBoundingRect = rocket.getBoundingClientRect();
+      setRocketPosition({
+        x: rocketBoundingRect.left,
+        y: rocketBoundingRect.top,
+      });
+      setRocketSize({
+        width: rocketBoundingRect.width,
+        height: rocketBoundingRect.height,
+      });
+      setInitialized(true);
+    }
 
-        heart.style.left = `${mouseX - heart.offsetWidth / 2}px`;
-        heart.style.top = `${mouseY - heart.offsetHeight / 2}px`;
+    const calculateNewRocketPosition = (
+      rocketX: number,
+      rocketY: number,
+      mouseX: number,
+      mouseY: number,
+      currentFps: number
+    ) => {
+      let xSpeed = (mouseX - rocketX) / (currentFps / 2);
+      let ySpeed = (mouseY - rocketY) / (currentFps / 2);
+      let x = rocketX + xSpeed;
+      let y = rocketY + ySpeed;
+      return { x, y };
+    };
+
+    const calculateRotationAngle = (
+      rocketX: number,
+      rocketY: number,
+      mouseX: number,
+      mouseY: number
+    ) => {
+      const dx = mouseX - rocketX;
+      const dy = mouseY - rocketY;
+      const angle = Math.atan2(dy, dx) * (180 / Math.PI); // Convert radian to degree
+      return angle + 45; // Adjust for rocket's orientation
+    };
+
+    const calculateTailPosition = (
+      rocketX: number,
+      rocketY: number,
+      angle: number
+    ) => {
+      const radians = angle * (Math.PI / 180);
+      const tailOffset = -33; // Distance from the rocket's end to the fume's center
+      const offsetX = (rocketSize.height / 2 + tailOffset) * Math.cos(radians);
+      const offsetY = (rocketSize.height / 2 + tailOffset) * Math.sin(radians);
+
+      return {
+        x: rocketX - offsetX,
+        y: rocketY - offsetY,
+      };
+    };
+
+    const handleMouseMove = (event: MouseEvent) => {
+      mousePosition.current = {
+        x: event.pageX,
+        y: event.pageY,
+      };
+    };
+
+    const removeFume = (fumeElement: HTMLDivElement) => {
+      fumeElement.remove();
+      fumes.current = fumes.current.filter(fume => fume !== fumeElement);
+    };
+
+    const updatePosition = () => {
+      if (rocketRef.current) {
+        const { x, y } = rocketPosition;
+        const { x: mouseX, y: mouseY } = mousePosition.current;
+
+        const newPosition = calculateNewRocketPosition(x, y, mouseX, mouseY, fps);
+        const rotationAngle = calculateRotationAngle(x, y, mouseX, mouseY);
+
+        setRocketPosition(newPosition);
+        rocketRef.current.style.transform = `translate(${newPosition.x - rocketSize.width / 2}px, ${newPosition.y - rocketSize.height / 2}px)`;
+
+        if (rocketRef.current.firstChild) {
+          (rocketRef.current.firstChild as HTMLElement).style.transform = `rotate(${rotationAngle}deg)`;
+        }
+
+        const tailPosition = calculateTailPosition(newPosition.x, newPosition.y, rotationAngle);
+
+        // Create fume effect behind the rocket at intervals
+        if (tick % fumeFrequency === 0) { // More rapid fume generation
+          const div = document.createElement("div");
+          div.style.cssText = `
+            width: 32px; 
+            height: 44px; 
+            position: fixed; 
+            top: ${tailPosition.y}px; 
+            left: ${tailPosition.x}px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            transform: translate(-50%, -50%);
+          `;
+
+          const span = document.createElement("span");
+          const fumeIndex = tick % fumeCount;
+          const fumeSize = fumeSizes.current[fumeIndex];
+          span.style.cssText = `
+            width: ${fumeSize}px; 
+            height: ${fumeSize}px; 
+            border-radius: ${fumeSize}px; 
+            background-color: white; 
+            animation: fadeout 1s ease-in forwards; 
+            opacity: 0.6; 
+            box-shadow: 0 0 100px #ffffff20;
+          `;
+          div.append(span);
+          body.append(div);
+          fumes.current.push(div);
+
+          // Remove the fume after the animation ends
+          span.addEventListener("animationend", () => removeFume(div));
+
+          // Ensure the number of fumes remains constant
+          if (fumes.current.length > fumeCount) {
+            const oldestFume = fumes.current.shift(); // Remove the oldest fume
+            if (oldestFume) removeFume(oldestFume);
+          }
+        }
+
+        setTick(tick + 1);
+        requestAnimationFrame(updatePosition);
       }
     };
 
-    const animate = () => {
-      // Update angle and tick
-      angle += 0.05;
-      tick++;
+    document.addEventListener('mousemove', handleMouseMove);
 
-      // Update fume particles (just an example of animation logic)
-      setFumes((prevFumes) => prevFumes.map((fume, index) => (index + tick) % 100));
-
-      // Request the next frame
-      requestAnimationFrame(animate);
-    };
-
-    // Start the animation
-    animate();
-
-    document.addEventListener('mousemove', updatePosition);
+    // Start the position update loop
+    requestAnimationFrame(updatePosition);
 
     return () => {
-      document.removeEventListener('mousemove', updatePosition);
+      document.removeEventListener('mousemove', handleMouseMove);
     };
-  }, []);
+  }, [rocketSize, initialized, rocketPosition, tick]);
 
   return (
-    <div className="rocket" ref={rocketRef}>
-      <svg viewBox="0 0 32 44" xmlns="http://www.w3.org/2000/svg">
-        <path d="M16 0C16 0 25 4.08 25 21C25 25.98 22.92 32.14 21.8 35H10.2C9.08 32.14 7 25.98 7 21C7 4.08 16 0 16 0ZM20 17C20 14.8 18.2 13 16 13C13.8 13 12 14.8 12 17C12 19.2 13.8 21 16 21C18.2 21 20 19.2 20 17ZM7.38 36.04C6.42 33.58 4.34 27.7 4.04 22.3L1.78 23.8C0.66 24.56 0 25.8 0 27.14V39L7.38 36.04ZM32 39V27.14C32 25.8 31.34 24.56 30.22 23.82L27.96 22.32C27.66 27.7 25.56 33.6 24.62 36.06L32 39Z" />
-      </svg>
-      <div className="glow"></div>
-      <div className="heart" ref={heartRef}>
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" className="icon icon-tabler icons-tabler-filled icon-tabler-heart">
-          <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-          <path fill="#dd2d4a" d="M6.979 3.074a6 6 0 0 1 4.988 1.425l.037 .033l.034 -.03a6 6 0 0 1 4.733 -1.44l.246 .036a6 6 0 0 1 3.364 10.008l-.18 .185l-.048 .041l-7.45 7.379a1 1 0 0 1 -1.313 .082l-.094 -.082l-7.493 -7.422a6 6 0 0 1 3.176 -10.215z" />
-        </svg>
+    <div className="rocket-container" style={{ position: 'absolute', left: rocketPosition.x - rocketSize.width / 2 - 20, top: rocketPosition.y - rocketSize.height / 2 }}>
+      <div className="rocket" ref={rocketRef}>
+        <img src='/cursor.svg' alt="Rocket" />
+        <div className="glow"></div>
+        <div className="heart" ref={heartRef}>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" className="icon icon-tabler icons-tabler-filled icon-tabler-heart">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+            <path fill="#dd2d4a" d="M6.979 3.074a6 6 0 0 1 4.988 1.425l.037 .033l.034 -.03a6 6 0 0 1 4.733 -1.44l.246 .036a6 6 0 0 1 3.364 10.008l-.18 .185l-.048 .041l-7.45 7.379a1 1 0 0 1 -1.313 .082l-.094 -.082l-7.493 -7.422a6 6 0 0 1 3.176 -10.215z" />
+          </svg>
+        </div>
       </div>
     </div>
   );
-}
+};
 
 export default Rocket;
