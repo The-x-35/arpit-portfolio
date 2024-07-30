@@ -1,6 +1,6 @@
 import Image from "next/image";
 import StarsCanvas from "./components/StarsCanvas";
-import Rocket from "./Rocket";
+import Rocket from "./components/Rocket";
 
 export default function Home() {
   return (
