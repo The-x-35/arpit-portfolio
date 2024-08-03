@@ -12,7 +12,7 @@ import First from "./components/First";
 export default function Home() {
   return (
     <>
-      <div className="relative">
+      <div>
         <div className="fixed top-0 left-0 w-full h-full -z-10">
           <StarsCanvas />
         </div>
