@@ -28,10 +28,6 @@ const Rocket: React.FC = () => {
 
     if (!initialized) {
       const rocketBoundingRect = rocket.getBoundingClientRect();
-      setRocketPosition({
-        x: rocketBoundingRect.left,
-        y: rocketBoundingRect.top,
-      });
       setRocketSize({
         width: rocketBoundingRect.width,
         height: rocketBoundingRect.height,
@@ -83,8 +79,8 @@ const Rocket: React.FC = () => {
 
     const handleMouseMove = (event: MouseEvent) => {
       mousePosition.current = {
-        x: event.pageX,
-        y: event.pageY,
+        x: event.clientX, // Use clientX for viewport-relative coordinates
+        y: event.clientY, // Use clientY for viewport-relative coordinates
       };
     };
 
@@ -123,6 +119,7 @@ const Rocket: React.FC = () => {
             align-items: center; 
             justify-content: center;
             transform: translate(-50%, -50%);
+            z-index: 10;
           `;
 
           const span = document.createElement("span");
@@ -167,8 +164,8 @@ const Rocket: React.FC = () => {
   }, [rocketSize, initialized, rocketPosition, tick]);
 
   return (
-    <div className="rocket-container" style={{ position: 'absolute', left: rocketPosition.x - rocketSize.width / 2 - 20, top: rocketPosition.y - rocketSize.height / 2 }}>
-      <div className="rocket" ref={rocketRef}>
+    <div className="rocket-container" style={{ position: 'fixed', left: rocketPosition.x - rocketSize.width / 2, top: rocketPosition.y - rocketSize.height / 2, zIndex: 20 }}>
+      <div className="rocket" ref={rocketRef} style={{ zIndex: 20 }}>
         <img src='/cursor.svg' alt="Rocket" />
         <div className="glow"></div>
         <div className="heart" ref={heartRef}>
