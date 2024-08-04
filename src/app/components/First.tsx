@@ -5,7 +5,7 @@ import ComputersCanvas from './ComputerCanvas';
 
 const First: React.FC = () => {
   return (
-    <section className={`w-full h-screen mx-auto overflow-hidden`}>
+    <section id="first" className={`w-full h-screen mx-auto overflow-hidden`}>
       <div className='flex flex-col justify-center items-center'>
         <div
           className="absolute inset-0 top-[120px] left-10 max-w-7xl mx-auto px-6 flex flex-col-reverse lg:flex-row items-start gap-5"
