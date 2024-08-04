@@ -18,7 +18,7 @@ const Computers: React.FC<ComputersProps> = ({ isMobile }) => {
       <pointLight intensity={1} />
       <primitive
         object={scene}
-        scale={isMobile ? 0.7 : 1.1}
+        scale={isMobile ? 0.5 : 1.1}
         position={isMobile ? [0, -3, -2.2] : [0, -3.25, -1.5]}
       />
     </mesh>
