@@ -1,10 +1,11 @@
+"use client";
 import { motion } from 'framer-motion';
 import React from 'react';
 import ComputersCanvas from './ComputerCanvas';
 
 const First: React.FC = () => {
   return (
-    <section className={`w-full h-screen mx-auto`}>
+    <section className={`w-full h-screen mx-auto overflow-hidden`}>
       <div className='flex flex-col justify-center items-center'>
         <div
           className="absolute inset-0 top-[120px] left-10 max-w-7xl mx-auto px-6 flex flex-col-reverse lg:flex-row items-start gap-5"
@@ -24,13 +25,9 @@ const First: React.FC = () => {
             </p>
           </div>
         </div>
-        <div className='flex flex-col justify-center items-center ml-20 mx-auto h-full w-full'>
-          <div className='relative lg:-mr-10 -mb-96 h-full w-full'>
-            
-          </div>
+        <div className='relative h-screen w-screen -mt-20 left-36'>
+          <ComputersCanvas />
         </div>
-        <div className='h-screen w-screen -mt-20 ml-60'>
-        <ComputersCanvas /></div>
         <div className='absolute xs:bottom-10 bottom-5 right-1 w-full flex justify-center items-center'>
           <a href='#about'>
             <div className='w-[35px] h-[64px] rounded-3xl border-4 border-secondary flex justify-center items-start p-2'>
