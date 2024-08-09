@@ -1,4 +1,3 @@
-'use client';
 import "./StarsCanvas.css" ;
 // import React, { useRef, useState, Suspense } from 'react';
 // import { Canvas, useFrame } from '@react-three/fiber';
