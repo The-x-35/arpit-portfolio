@@ -8,6 +8,10 @@ body {
   background-position-y: left;
   display: grid;
   place-content: center;
+  -webkit-user-select: none; /* Prevent text selection in WebKit browsers */
+  -moz-user-select: none;    /* Prevent text selection in Firefox */
+  -ms-user-select: none;     /* Prevent text selection in Internet Explorer/Edge */
+  user-select: none;       /* Prevent text selection in other browsers */
 }
 
 h1 {
@@ -102,3 +106,12 @@ h1 {
   }
 }
 
+.rocket-container {
+  pointer-events: none; /* Disable all mouse events for the rocket container */
+}
+
+.rocket {
+  user-select: none; /* Prevent text selection */
+  -webkit-user-drag: none; /* Prevent dragging */
+  cursor: default; /* Change cursor to default when hovering over the rocket */
+}
